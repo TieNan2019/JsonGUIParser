@@ -2,9 +2,11 @@
 #define PARSER_H
 
 #include <QWidget>
+#include <QComboBox>
 
 #include <QFile>
 
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
 
@@ -13,7 +15,7 @@
 
 #include <QDebug>
 
-#define __DEBUG__
+//#define __DEBUG__
 
 
 #define INSTANCE_PATH   "/home/whoami/workspace/MIoT/lab/massager.json"
@@ -32,10 +34,18 @@ public:
         ~Parser();
 
 private:
-        QJsonObject jsonObj;
+        QJsonObject *jsonObj;
+        QComboBox *comboBoxServ;
+        QComboBox *comboBoxProp;
 
         QString FileRead(const QString&);
         QJsonObject JsonParse(const QString&);
+        QJsonObject *JsonLoader(const QString &);
+
+        void InitWidget();
+        QComboBox *ServLoader();
+        QComboBox *PropLoader();
+        int BoxReloader();
 
         Ui::Parser *ui;
 };
