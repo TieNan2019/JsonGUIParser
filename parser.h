@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QPushButton>
+#include <QLineEdit>
 #include <QPlainTextEdit>
 #include <QComboBox>
 
@@ -20,7 +21,7 @@
 
 
 
-#define INSTANCE_PATH   "/home/whoami/workspace/MIoT/lab/massager.json"
+#define INSTANCE_PATH   "/home/whoami/massager.json"
 
 
 QT_BEGIN_NAMESPACE
@@ -32,7 +33,7 @@ class Parser : public QWidget
         Q_OBJECT
 
 public:
-        Parser(QWidget *parent = nullptr);
+        Parser(QString path, QWidget *parent = nullptr);
         ~Parser();
 
 private slots:
@@ -41,16 +42,22 @@ private slots:
         void PropChanged(int );
         void ServChanged(int );
         void SaveCmd();
+        void ReloadCmd();
+        void OKCmd();
 
 
 private:
+
         QJsonObject *jsonObj;
         QComboBox *comboBoxServ;
         QComboBox *comboBoxProp;
         QComboBox *comboBoxIndex;
         QComboBox *comboBoxKey;
         QPlainTextEdit *itemContent;
+        QLineEdit *jsonPath;
         QPushButton *saveButton;
+        QPushButton *reloadButton;
+        QPushButton *okButton;
 
         QString FileRead(const QString&);
         QJsonObject JsonParse(const QString&);

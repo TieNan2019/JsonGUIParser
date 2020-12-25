@@ -4,6 +4,10 @@
 
 
 
+
+
+
+
 QString Parser::FileRead(const QString& path) {
 #ifdef __DEBUG__
         qDebug() << "Json Path : " << path;
@@ -273,19 +277,35 @@ int Parser::BoxReloader() {
         this->comboBoxServ->move(0, 0);
         this->comboBoxServ->resize(180, 30);
 
+        this->reloadButton = new QPushButton(this);
+        this->reloadButton->move(715, 50);
+        this->reloadButton->resize(70, 25);
+        this->reloadButton->setText("reload");
+        this->reloadButton->setDisabled(true);
+
         this->saveButton = new QPushButton(this);
-        this->saveButton->move(715, 50);
+        this->saveButton->move(715, 75);
         this->saveButton->resize(70, 25);
-        this->saveButton->setText("Save");
+        this->saveButton->setText("save");
+        this->saveButton->setDisabled(true);
+
+        this->okButton = new QPushButton(this);
+        this->okButton->move(715, 100);
+        this->okButton->resize(70, 25);
+        this->okButton->setText("OK");
+//        this->okButton->setDisabled(true);
+
+        this->jsonPath = new QLineEdit(this);
+        this->jsonPath->move(0, 150);
+        this->jsonPath->resize(700, 30);
+        this->jsonPath->setText("insert your instance path here");
+        this->jsonPath->setDisabled(true);
+
 
         this->comboBoxServ = ServLoader();
         this->comboBoxProp = PropLoader();
         this->ShortContent();
-
-
-
         this->comboBoxKey->setCurrentIndex(0);
-
         this->TextLoader();
 
 
@@ -297,9 +317,12 @@ int Parser::BoxReloader() {
         connect(this->comboBoxServ, itemSwitch, this, &Parser::ServChanged);
 
         connect(this->saveButton, &QPushButton::released, this, &Parser::SaveCmd);
+        connect(this->reloadButton, &QPushButton::released, this, &Parser::ReloadCmd);
+        connect(this->okButton, &QPushButton::released, this, &Parser::OKCmd);
 
         return 0;
 }
+
 
 
 void Parser::KeyChanged(int ) {
@@ -325,18 +348,37 @@ void Parser::ServChanged(int ) {
 
 void Parser::SaveCmd() {
         qDebug() << "Save Event!";
+
+        QString text = this->itemContent->document()->toPlainText();
+        qDebug() << text;
+
 }
 
 
-Parser::Parser(QWidget *parent)
+void Parser::ReloadCmd() {
+        qDebug() << "Reload Event!";
+
+        QString text = this->itemContent->document()->toPlainText();
+        qDebug() << text;
+
+}
+
+
+void Parser::OKCmd() {
+        qDebug() << QJsonDocument(*(this->jsonObj)).toJson();
+        exit(0);
+}
+
+
+Parser::Parser(QString path, QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::Parser)
 {
-        this->jsonObj = JsonLoader(INSTANCE_PATH);
+        this->jsonObj = JsonLoader(path);
 
         InitWidget();
 
-        BoxReloader();Parser::
+        BoxReloader();
 
         ui->setupUi(this);
 }
@@ -352,6 +394,12 @@ Parser::~Parser()
         delete comboBoxProp;
         delete itemContent;
         delete comboBoxIndex;
+
+        delete saveButton;
+        delete reloadButton;
+        delete okButton;
+
+        delete jsonPath;
 
         delete ui;
 }
