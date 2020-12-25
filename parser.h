@@ -2,6 +2,8 @@
 #define PARSER_H
 
 #include <QWidget>
+#include <QPushButton>
+#include <QPlainTextEdit>
 #include <QComboBox>
 
 #include <QFile>
@@ -15,8 +17,6 @@
 //#define __DEBUG__
 
 
-
-#include <QPlainTextEdit>
 
 
 
@@ -40,6 +40,7 @@ private slots:
         void IndexChanged(int );
         void PropChanged(int );
         void ServChanged(int );
+        void SaveCmd();
 
 
 private:
@@ -49,6 +50,7 @@ private:
         QComboBox *comboBoxIndex;
         QComboBox *comboBoxKey;
         QPlainTextEdit *itemContent;
+        QPushButton *saveButton;
 
         QString FileRead(const QString&);
         QJsonObject JsonParse(const QString&);

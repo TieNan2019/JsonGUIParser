@@ -86,7 +86,7 @@ QComboBox *Parser::ServLoader() {
                 + "-" + item["description"].toString());
         }
 
-        comboBoxServ->setCurrentIndex(2);
+        comboBoxServ->setCurrentIndex(0);
 
         return this->comboBoxServ;
 }
@@ -117,10 +117,13 @@ QJsonObject Parser::GetProp() {
 
 
 QComboBox *Parser::PropLoader() {
+        if (this->comboBoxProp->count() > 0)
+                this->comboBoxProp->clear();
+
         QJsonObject props = GetProp();
         this->comboBoxProp->addItems(props.keys());
 
-//        this->comboBoxProp->setCurrentIndex(2);
+        this->comboBoxProp->setCurrentIndex(0);
 
         return this->comboBoxProp;
 }
@@ -130,6 +133,9 @@ QComboBox *Parser::PropLoader() {
 QComboBox *Parser::KeyLoader() {
         if (this->comboBoxIndex->count() == 0)
                 return this->comboBoxKey;
+
+        if (this->comboBoxKey->count() > 0)
+                this->comboBoxKey->clear();
 
         QJsonObject props = GetProp();
         QString serv = this->comboBoxProp->currentText();
@@ -144,13 +150,15 @@ QComboBox *Parser::KeyLoader() {
                 QJsonObject obj = item.toObject();
                 if (obj["iid"].toInt() == iid) {
                         this->comboBoxKey->addItems(obj.keys());
-
+//        this->comboBoxKey->clear();
 #ifdef __DEBUG__
                         qDebug() << obj.keys();
 #endif
                         return this->comboBoxKey;
                 }
         }
+
+        this->comboBoxKey->setCurrentIndex(0);
 
         return this->comboBoxKey;
 }
@@ -159,6 +167,7 @@ QComboBox *Parser::KeyLoader() {
 QPlainTextEdit *Parser::TextLoader() {
         if (this->comboBoxKey->count() == 0)
                 return this->itemContent;
+
 
         QJsonObject props = GetProp();
         QString serv = this->comboBoxProp->currentText();
@@ -203,6 +212,9 @@ QPlainTextEdit *Parser::ShortContent() {
         qDebug() << prop[key];
 #endif
 
+        if (this->comboBoxIndex->count() > 0)
+                this->comboBoxIndex->clear();
+
         if (prop[key].isString()) {
                 this->itemContent->setPlainText(prop[key].toString());
                 this->comboBoxIndex->clear();
@@ -241,9 +253,9 @@ QPlainTextEdit *Parser::ShortContent() {
 
 
 int Parser::BoxReloader() {
-
         this->itemContent = new QPlainTextEdit(this);
         this->itemContent->move(0, 40);
+        this->itemContent->resize(700, 100);
 
         this->comboBoxKey = new QComboBox(this);
         this->comboBoxKey->move(600, 0);
@@ -261,44 +273,58 @@ int Parser::BoxReloader() {
         this->comboBoxServ->move(0, 0);
         this->comboBoxServ->resize(180, 30);
 
+        this->saveButton = new QPushButton(this);
+        this->saveButton->move(715, 50);
+        this->saveButton->resize(70, 25);
+        this->saveButton->setText("Save");
+
         this->comboBoxServ = ServLoader();
         this->comboBoxProp = PropLoader();
         this->ShortContent();
 
 
-        this->comboBoxKey->setCurrentIndex(5);
 
+        this->comboBoxKey->setCurrentIndex(0);
 
         this->TextLoader();
 
-        connect(this->comboBoxKey, SIGNAL(currentIndexChanged(int)), this, SLOT(KeyChanged(int)));
-        connect(this->comboBoxIndex, SIGNAL(currentIndexChanged(int)), this, SLOT(IndexChanged(int)));
-        connect(this->comboBoxProp, SIGNAL(currentIndexChanged(int)), this, SLOT(PropChanged(int)));
-        connect(this->comboBoxServ, SIGNAL(currentIndexChanged(int)), this, SLOT(ServChanged(int)));
+
+        auto (QComboBox::*itemSwitch)(int) = &QComboBox::currentIndexChanged;
+
+        connect(this->comboBoxKey, itemSwitch, this, &Parser::KeyChanged);
+        connect(this->comboBoxIndex, itemSwitch, this, &Parser::IndexChanged);
+        connect(this->comboBoxProp, itemSwitch, this, &Parser::PropChanged);
+        connect(this->comboBoxServ, itemSwitch, this, &Parser::ServChanged);
+
+        connect(this->saveButton, &QPushButton::released, this, &Parser::SaveCmd);
 
         return 0;
 }
 
 
-void Parser::KeyChanged(int idx) {
+void Parser::KeyChanged(int ) {
         this->TextLoader();
 }
 
-void Parser::IndexChanged(int idx) {
-        this->comboBoxKey->clear();
+void Parser::IndexChanged(int ) {
         this->KeyLoader();
 }
 
-void Parser::PropChanged(int idx) {
-        this->comboBoxIndex->clear();
+void Parser::PropChanged(int ) {
+
         this->ShortContent();
 }
 
 
-void Parser::ServChanged(int idx) {
-        this->comboBoxProp->clear();
-        this->itemContent->clear();
+void Parser::ServChanged(int ) {
+
         this->PropLoader();
+}
+
+
+
+void Parser::SaveCmd() {
+        qDebug() << "Save Event!";
 }
 
 
@@ -310,7 +336,7 @@ Parser::Parser(QWidget *parent)
 
         InitWidget();
 
-        BoxReloader();
+        BoxReloader();Parser::
 
         ui->setupUi(this);
 }
